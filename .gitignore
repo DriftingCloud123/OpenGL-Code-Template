@@ -1,0 +1,13 @@
+# 编译输出文件
+build/*.exe
+build/*.o
+build/*.pdb
+!build/.gitkeep
+
+# VS Code 本地索引与临时文件
+.vscode/.browse.VC.db*
+.vscode/*.log
+
+# 操作系统生成文件
+.DS_Store
+Thumbs.db
