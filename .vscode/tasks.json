@@ -3,16 +3,18 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "Build OpenGL Project with g++",
+            "label": "Build OpenGL Project (Debug)",
             "command": "g++",
             "args": [
                 "-g",
-                "${workspaceFolder}/src/glad.c",
+                "-std=c++17",
+                "${workspaceFolder}/vendor/src/glad.c",
                 "${workspaceFolder}/src/*.cpp",
                 "-o",
                 "${workspaceFolder}/build/main.exe",
                 "-I${workspaceFolder}/include",
-                "-L${workspaceFolder}/lib",
+                "-I${workspaceFolder}/vendor/include",
+                "-L${workspaceFolder}/vendor/lib",
                 "-lglfw3",
                 "-lopengl32",
                 "-lgdi32"
@@ -25,7 +27,35 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "detail": "Compiler: g++.exe (自动编译 src 下所有 cpp 源文件)"
+            "detail": "Debug 构建：包含 -g 调试信息，用于断点排错"
+        },
+        {
+            "type": "shell",
+            "label": "Build OpenGL Project (Release)",
+            "command": "g++",
+            "args": [
+                "-O3",
+                "-DNDEBUG",
+                "-std=c++17",
+                "${workspaceFolder}/vendor/src/glad.c",
+                "${workspaceFolder}/src/*.cpp",
+                "-o",
+                "${workspaceFolder}/build/main.exe",
+                "-I${workspaceFolder}/include",
+                "-I${workspaceFolder}/vendor/include",
+                "-L${workspaceFolder}/vendor/lib",
+                "-lglfw3",
+                "-lopengl32",
+                "-lgdi32"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": ["$gcc"],
+            "group": {
+                "kind": "build"
+            },
+            "detail": "Release 构建：开启 -O3 优化与 NDEBUG，获得极致运行帧率"
         }
     ]
 }

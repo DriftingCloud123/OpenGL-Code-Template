@@ -20,7 +20,28 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "Build OpenGL Project with g++"
+            "preLaunchTask": "Build OpenGL Project (Debug)"
+        },
+        {
+            "name": "Release OpenGL (Run - O3)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/main.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "gdb.exe",
+            "setupCommands": [
+                {
+                    "description": "为 gdb 启用整齐打印",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "Build OpenGL Project (Release)"
         }
     ]
 }

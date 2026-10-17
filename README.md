@@ -1,6 +1,6 @@
 # OpenGL VS Code 现代化通用模板工程 (Modern OpenGL Template)
 
-基于 **C++17 + MinGW-w64 + GLFW + GLAD + GLM** 的轻量级、开箱即用图形学开发模板。
+基于 **C++17 + MinGW-w64 + GLFW + GLAD + GLM** 的通用图形学开发模板。
 
 ---
 
@@ -9,61 +9,57 @@
 ```text
 OpenGL_Codes/
 ├── .vscode/
-│   ├── c_cpp_properties.json   # 包含路径、C++17标准、MinGW编译器配置
-│   ├── tasks.json              # 自动化构建脚本（支持 src/*.cpp 多文件编译）
-│   └── launch.json             # F5 调试配置（预先绑定编译任务与 GDB 调试器）
-├── build/                      # 编译输出目录（可执行程序生成在此处）
+│   ├── c_cpp_properties.json
+│   ├── tasks.json
+│   └── launch.json
+├── assets/                     # 存放静态资产（着色器、贴图、模型等）
+│   ├── shaders/                # 存放顶点着色器与片段着色器源码
+│   │   ├── shader.vert         # 示例顶点着色器
+│   │   └── shader.frag         # 示例片段着色器
+│   └── textures/               # 实验贴图图片素材 (.jpg, .png)
+├── build/                      # 编译输出目录
 │   └── .gitkeep
-├── include/
-│   ├── glad/                   # OpenGL 4.6 / 3.3 函数加载器
-│   ├── GLFW/                   # 跨平台窗口与输入处理库
-│   ├── KHR/                    # Khronos 跨平台标准头
-│   ├── glm/                    # OpenGL 数学库（向量、矩阵变换、四元数）
+├── include/                    # 存放自定义模块头文件
 │   └── Shader.h                # 标准着色器加载与编译辅助类
-├── lib/
-│   └── libglfw3.a              # MinGW-w64 64位静态链接库
-├── shaders/                    # 存放顶点着色器与片段着色器源码
-│   ├── shader.vert             # 示例顶点着色器
-│   └── shader.frag             # 示例片段着色器
-├── textures/                   # 存放实验贴图图片素材 (.jpg, .png)
-├── src/
-│   ├── glad.c                  # GLAD 实现文件
+├── src/                        # 存放自定义模块源文件与程序入口
 │   └── main.cpp                # 程序入口与渲染主循环
-├── .gitignore                  # Git 忽略文件（过滤可执行文件与缓存）
-└── README.md                   # 模板使用说明文档
+├── vendor/                     # 存放第三方依赖（头文件、实现与静态库）
+│   ├── include/                # glad, GLFW, KHR, glm
+│   ├── src/                    # glad.c
+│   └── lib/                    # libglfw3.a
+├── .gitignore
+└── README.md
 ```
 
----
+## 🛠️ 使用指南
 
-## 极速上手使用指南
+### 🚀 快速上手
 
-### 1. 从模板新建一个项目
-1. 将 `OpenGL_Codes` 文件夹整体复制一份，重命名为你想要的项目名（如 `Lab1_Transform`）。
-2. 在 **VS Code** 中点击 **“文件” -> “打开文件夹”**，选择进入新目录。
+使用 **VS Code** 打开本项目，打开左侧栏的**运行与调试**（Ctrl+Shift+D），选择`Debug OpenGL (gdb)`或者`Release OpenGL (Run - O3)`，之后开始调试（F5）或者运行（Ctrl + F5），即可看到渲染出来的橙色矩形
 
-### 2. 编译与调试
-* **快捷键 F5**：自动触发编译并启动 **GDB 单步断点调试**。
-* **快捷键 Ctrl + Shift + B**：仅执行编译，生成可执行文件到 `build/main.exe`。
+### ⚙️ 编写项目
+在`src`下编写源码，项目会将`src`下的所有cpp文件以及`vendor\src\glad.c`一起编译，最终放到`build`下
 
-### 3. 多源文件支持
-* 本模板已配置通配符编译，只要你在 `src/` 目录下添加任意新的 `.cpp` 文件（如 `src/Camera.cpp`、`src/Mesh.cpp`），**无需修改任何配置文件**，按 `F5` 即可自动全部打包编译。
+编译成功的`exe`文件需在根目录下进行运行，否则会找不到相关资源，如：
+```bash
+.\build\main.exe
+```
 
-### 4. 辅助工具类 `Shader.h` 使用示例
-模板中已自带标准着色器加载器：
+### 🔥 自定义着色器
+着色器源码建议存放在`assets\shaders`下，可以编写自己的着色器，里面存放了最简单的着色器，推荐配合插件 _Shader Studio_ 使用。
+
+着色器类在`include\Shader.h`下，完整定义了`Shader`类，目前支持顶点着色器、几何着色器（可选）和片段着色器三种，在`assets\shaders`下编写完着色器源码之后，使用源码的路径初始化Shader对象：
 ```cpp
-#include <Shader.h>
-
-// 构造函数自动读取并编译着色器
-Shader ourShader("shaders/shader.vert", "shaders/shader.frag");
-
-// 激活程序
-ourShader.use();
-
-// 便捷传递 Uniform 矩阵或向量
-ourShader.setMat4("model", modelMatrix);
-ourShader.setVec3("lightColor", glm::vec3(1.0f));
+Shader ourShader('path/to/vertexShade.vert', 'path/to/fragmentShader.frag', 'path/to/geometryShader.geom');
 ```
 
-## 🎉感谢
+之后可以使用`Shader`类的各种方法来对着色器进行控制，如：
+```
+ourShader.use()     //相当于glUseProgram
+ourShader.destroy() //相当于glDeleteProgram
+……
+```
+
+## 🎉 感谢
 
 感谢教程网站 [LearnOpenGL](https://learnopengl-cn.github.io/) ，这个网站在我的学习中帮助了我许多，源码中的大多数都是参考了这个网站。

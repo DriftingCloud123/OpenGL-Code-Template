@@ -2,6 +2,8 @@
 // 先引用glad再引用glfw
 #include<glad/glad.h>
 #include<GLFW/glfw3.h>
+// 引用Shader工具类
+#include<Shader.h>
 
 // Callback Function
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -79,100 +81,23 @@ int main(){
     // 顶点着色器 → 图元装配 → 光栅化 → 片段着色器 → 深度测试/混合 → 像素
     /*
      * 参考内容：
-     * 顶点着色器源码字符串
-     * 片段着色器源码字符串
-     * 编译顶点着色器
-     * 编译片段着色器
-     * 创建着色器程序，链接，检查错误
-     * 删除着色器对象
-     * 创建 VAO 和 VBO，上传顶点数据，配置顶点属性
-     * 进入渲染循环：每帧 glUseProgram、绑定 VAO、glDrawArrays
+     ┌────────────────这部分已被类封装────────────────
+     |* 顶点着色器源码字符串
+     |* 片段着色器源码字符串
+     |* 编译顶点着色器
+     |* 编译片段着色器
+     |* 创建着色器程序，链接，检查错误
+     |* 删除着色器对象
+     └───────────────────────────────────────────────
+     * 创建 VAO 和 VBO，上传顶点数据，配置顶点属性与绘制索引
+     * 进入渲染循环：每帧 glUseProgram、绑定 VAO、glDrawArrays/glDrawElements
      * 循环结束后清理：删除 VAO、VBO、着色器程序
      */
 
     // ============================================
     // 着色器部分
     // ============================================
-
-    // 顶点/片段着色器源码
-    const char *vertexShaderSource = "#version 330 core\n"
-        "layout (location = 0) in vec3 aPos;\n"
-        "void main()\n"
-        "{\n"
-        "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-        "}\0";
-
-    const char *fragmentShaderSource = "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "void main()\n"
-        "{\n"
-        "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-        "}\n\0";
-    
-    // 创建顶点/片段着色器对象
-    unsigned int vertexShader, fragmentShader;
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-    // 把着色器源码附加到着色器对象上，然后编译它们
-    int  success;
-    char infoLog[512];
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    // 编译错误报错检查
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
-        glfwDestroyWindow(window);
-        glfwTerminate();
-        return -1;
-    }
-
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    // 编译错误报错检查
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
-        glfwDestroyWindow(window);
-        glfwTerminate();
-        return -1;
-    }
-
-    // 着色器程序
-    // 创建着色器程序
-    unsigned int shaderProgram;
-    shaderProgram = glCreateProgram();
-    // 将着色器附加到程序，之后进行链接
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    // 检测链接(着色器程序)错误
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success)
-    {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
-        glDeleteProgram(shaderProgram);
-        glfwDestroyWindow(window);
-        glfwTerminate();
-        return -1;
-    }
-    // 之后可以激活程序对象，每个着色器调用和渲染调用都会使用这个程序对象
-    // glUseProgram(shaderProgram);
-    // 在把着色器对象链接到程序对象以后，记得删除着色器对象，我们不再需要它们了
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    Shader ourShader("assets/shaders/shader.vert", "assets/shaders/shader.frag");
 
     // ============================================
     // 将数据传输到GPU并配置绘制说明
@@ -244,7 +169,7 @@ int main(){
         glClear(GL_COLOR_BUFFER_BIT);           // 清空背景并重新渲染指定颜色
 
         // 绘制前绑定
-        glUseProgram(shaderProgram);
+        ourShader.use();
         // 这里绑定VAO即可，VAO已记录属性数据源(VBO)与索引缓冲(EBO)
         // 同时绑定VAO会自动切换EBO绑定
         glBindVertexArray(VAO);
@@ -268,7 +193,7 @@ int main(){
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
-    glDeleteProgram(shaderProgram);
+    ourShader.destroy();
     glfwDestroyWindow(window);
 
     glfwTerminate();
