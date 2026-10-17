@@ -35,7 +35,7 @@ OpenGL_Codes/
 
 ---
 
-## 🚀 极速上手使用指南
+## 极速上手使用指南
 
 ### 1. 从模板新建一个项目
 1. 将 `OpenGL_Codes` 文件夹整体复制一份，重命名为你想要的项目名（如 `Lab1_Transform`）。
@@ -63,3 +63,7 @@ ourShader.use();
 ourShader.setMat4("model", modelMatrix);
 ourShader.setVec3("lightColor", glm::vec3(1.0f));
 ```
+
+## 🎉感谢
+
+感谢教程网站 [LearnOpenGL](https://learnopengl-cn.github.io/) ，这个网站在我的学习中帮助了我许多，源码中的大多数都是参考了这个网站。
