@@ -2,8 +2,9 @@
 // 先引用glad再引用glfw
 #include<glad/glad.h>
 #include<GLFW/glfw3.h>
-// 引用Shader工具类
-#include<Shader.h>
+// 引用工具
+#include<stb_image.h>   // 图片处理
+#include<Shader.h>      // 着色器
 
 // Callback Function
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -17,18 +18,19 @@ void processInput(GLFWwindow *window)
 
 // 顶点坐标
 float vertices[] = {
-     0.5f,  0.5f, 0.0f, // 右上
-     0.5f, -0.5f, 0.0f, // 右下
-    -0.5f, -0.5f, 0.0f, // 左下
-    -0.5f,  0.5f, 0.0f, // 左上
+//     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
+     0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // 右上
+     0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // 右下
+    -0.5f, -0.5f, 0.0f,   0.0f, 0.5f, 1.0f,   0.0f, 0.0f,   // 左下
+    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 左上
 };
 
 // 创建绘图索引
 unsigned int indices[] = {
     // 第一个三角形
-    0, 1, 3,
+    0, 1, 2,
     // 第二个三角形
-    1, 2, 3
+    0, 2, 3
 };
 
 int main(){
@@ -128,9 +130,15 @@ int main(){
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     
     // 设置顶点属性指针
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(0 * sizeof(float)));   // 位置属性
     // 开启VAO管理的第一个属性
     glEnableVertexAttribArray(0);
+
+    // 设置并管理其他属性
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));   // 颜色属性
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));   // 材质坐标属性
+    glEnableVertexAttribArray(2);
 
     // 当我们渲染一个物体时要使用着色器程序
     // 绘制物体
@@ -143,6 +151,38 @@ int main(){
     glBindVertexArray(0);   // 解绑VAO
     glBindBuffer(GL_ARRAY_BUFFER, 0);   // 上传数据到GPU并在VAO进行配置之后，可以解绑VBO，防止意外修改
     // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);   // 不要单独解绑EBO，EBO绑定属于VAO状态，解绑会清掉VAO记录的索引缓冲
+
+    // ============================================
+    // 材质绑定
+    // ============================================
+    //生成并绑定材质
+    unsigned int texture;
+    glGenTextures(1, &texture);
+    glActiveTexture(GL_TEXTURE0);   // 绑定前先激活槽位
+    glBindTexture(GL_TEXTURE_2D, texture);
+    // 为当前绑定的纹理对象设置环绕、过滤方式
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // 加载并生成纹理
+    stbi_set_flip_vertically_on_load(true);     // 上下颠倒反转读取，对应坐标
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("assets/textures/container.jpg", &width, &height, &nrChannels, 0);
+    if (data){
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else{
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
+    // 将着色器的材质指向材质的槽位（如果不指定，默认是0），即和glActiveTexture里面的GL_TEXTURE0对应
+    // 本例中可以不绑定，但是如果要用多个材质，需要绑定
+    ourShader.use();
+    ourShader.setInt("ourTexture", 0);
+
 
     // ============================================
     // 准备绘制
