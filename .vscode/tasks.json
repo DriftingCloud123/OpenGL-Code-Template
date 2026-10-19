@@ -8,7 +8,7 @@
             "args": [
                 "-g",
                 "-std=c++17",
-                "${workspaceFolder}/vendor/src/glad.c",
+                "${workspaceFolder}/vendor/src/*.c*",
                 "${workspaceFolder}/src/*.cpp",
                 "-o",
                 "${workspaceFolder}/build/main.exe",
@@ -37,7 +37,7 @@
                 "-O3",
                 "-DNDEBUG",
                 "-std=c++17",
-                "${workspaceFolder}/vendor/src/glad.c",
+                "${workspaceFolder}/vendor/src/*.c*",
                 "${workspaceFolder}/src/*.cpp",
                 "-o",
                 "${workspaceFolder}/build/main.exe",

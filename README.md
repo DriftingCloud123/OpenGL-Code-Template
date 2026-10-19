@@ -1,6 +1,6 @@
 # OpenGL VS Code 现代化通用模板工程 (Modern OpenGL Template)
 
-基于 **C++17 + MinGW-w64 + GLFW + GLAD + GLM** 的通用图形学开发模板。
+基于 **C++17 + MinGW-w64 + GLFW + GLAD + GLM + stb_image** 的通用图形学开发模板。
 
 ---
 
@@ -24,8 +24,8 @@ OpenGL_Codes/
 ├── src/                        # 存放自定义模块源文件与程序入口
 │   └── main.cpp                # 程序入口与渲染主循环
 ├── vendor/                     # 存放第三方依赖（头文件、实现与静态库）
-│   ├── include/                # glad, GLFW, KHR, glm
-│   ├── src/                    # glad.c
+│   ├── include/                # glad, GLFW, KHR, glm, stb_image.h
+│   ├── src/                    # glad.c, stb_image.cpp
 │   └── lib/                    # libglfw3.a
 ├── .gitignore
 └── README.md
@@ -38,7 +38,7 @@ OpenGL_Codes/
 使用 **VS Code** 打开本项目，打开左侧栏的**运行与调试**（Ctrl+Shift+D），选择`Debug OpenGL (gdb)`或者`Release OpenGL (Run - O3)`，之后开始调试（F5）或者运行（Ctrl + F5），即可看到渲染出来的橙色矩形
 
 ### ⚙️ 编写项目
-在`src`下编写源码，项目会将`src`下的所有cpp文件以及`vendor\src\glad.c`一起编译，最终放到`build`下
+在`src`下编写源码，项目会将`src`下的所有cpp文件以及`vendor\src`下的第三方源码一起自动编译，最终放到`build`下
 
 编译成功的`exe`文件需在根目录下进行运行，否则会找不到相关资源，如：
 ```bash
