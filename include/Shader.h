@@ -18,7 +18,6 @@ public:
     // 构造器读取并构建着色器（可选支持几何着色器 geometryPath）
     Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr)
     {
-        // 1. 从文件路径中获取顶点/片段（以及几何）着色器源码
         std::string vertexCode;
         std::string fragmentCode;
         std::string geometryCode;
@@ -26,23 +25,21 @@ public:
         std::ifstream fShaderFile;
         std::ifstream gShaderFile;
 
-        // 保证ifstream对象可以抛出异常：
         vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
         fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
         gShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
         try 
         {
-            // 打开文件
             vShaderFile.open(vertexPath);
             fShaderFile.open(fragmentPath);
             std::stringstream vShaderStream, fShaderStream;
-            // 读取文件的缓冲内容到数据流中
+
             vShaderStream << vShaderFile.rdbuf();
             fShaderStream << fShaderFile.rdbuf();
-            // 关闭文件处理器
+
             vShaderFile.close();
             fShaderFile.close();
-            // 转换数据流到string
+
             vertexCode = vShaderStream.str();
             fragmentCode = fShaderStream.str();
 
@@ -66,8 +63,9 @@ public:
         const char* vShaderCode = vertexCode.c_str();
         const char* fShaderCode = fragmentCode.c_str();
 
-        // 2. 编译着色器
+        // 编译着色器
         unsigned int vertex, fragment;
+
         // 顶点着色器
         vertex = glCreateShader(GL_VERTEX_SHADER);
         glShaderSource(vertex, 1, &vShaderCode, NULL);
