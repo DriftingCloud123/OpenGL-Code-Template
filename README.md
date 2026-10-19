@@ -35,7 +35,9 @@ OpenGL_Codes/
 
 ### 🚀 快速上手
 
-使用 **VS Code** 打开本项目，打开左侧栏的**运行与调试**（Ctrl+Shift+D），选择`Debug OpenGL (gdb)`或者`Release OpenGL (Run - O3)`，之后开始调试（F5）或者运行（Ctrl + F5），即可看到渲染出来的橙色矩形
+使用 **VS Code** 打开本项目，打开左侧栏的**运行与调试**（Ctrl+Shift+D），选择`Debug OpenGL (gdb)`或者`Release OpenGL (Run - O3)`，之后开始调试（F5）或者运行（Ctrl + F5），即可看到渲染出来的带有颜色的木箱材质矩形。
+
+弹出窗口后，可以点击右上角关闭窗口，也可以按下`Esc`键关闭窗口。
 
 ### ⚙️ 编写项目
 在`src`下编写源码，项目会将`src`下的所有cpp文件以及`vendor\src`下的第三方源码一起自动编译，最终放到`build`下
@@ -45,10 +47,12 @@ OpenGL_Codes/
 .\build\main.exe
 ```
 
-### 🔥 自定义着色器
-着色器源码建议存放在`assets\shaders`下，可以编写自己的着色器，里面存放了最简单的着色器，推荐配合插件 _Shader Studio_ 使用。
+### 🔥 着色器
+着色器源码建议存放在`assets\shaders`下，可以编写自己的着色器，里面存放了示例使用的顶点着色器和片段着色器，推荐配合插件 _Shader Studio_ 使用。
 
 着色器类在`include\Shader.h`下，完整定义了`Shader`类，目前支持顶点着色器、几何着色器（可选）和片段着色器三种，在`assets\shaders`下编写完着色器源码之后，使用源码的路径初始化Shader对象：
+
+
 ```cpp
 Shader ourShader('path/to/vertexShade.vert', 'path/to/fragmentShader.frag', 'path/to/geometryShader.geom');
 ```
@@ -58,6 +62,18 @@ Shader ourShader('path/to/vertexShade.vert', 'path/to/fragmentShader.frag', 'pat
 ourShader.use()     //相当于glUseProgram
 ourShader.destroy() //相当于glDeleteProgram
 ……
+```
+
+### 🧱 材质
+材质资源（图片等）建议存放在`assets\textures`下，存放自定义材质。
+
+为方面读取，项目加入了`stb image`库，存放在`vendor\include\stb_image.h`下，同时对应的源文件也存放在src下，使用时直接在`main.cpp`下引用头文件即可：
+```cpp
+include<stb_image.h>
+```
+由于jpg/png等图片的坐标和OpenGL的材质坐标上下颠倒，使用前建议指定stb库上下翻转读取：
+```cpp
+stbi_set_flip_vertically_on_load(true); // 上下颠倒翻转读取
 ```
 
 ## 🎉 感谢
