@@ -1,13 +1,13 @@
-#include<iostream>
+#include <iostream>
 // 先引用glad再引用glfw
-#include<glad/glad.h>
-#include<GLFW/glfw3.h>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 // 工具
-#include<stb_image.h>   // 图片处理
-#include<Shader.h>      // 着色器
-#include<Camera.h>      // 摄像机
+#include <stb_image.h>   // 图片处理
+#include "Shader.h"      // 着色器
+#include "Camera.h"      // 摄像机
 // 数学库
-#include<cmath>
+#include <cmath>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -23,15 +23,18 @@ float deltaTime = 0.0f; // 当前帧与上一帧的时间差
 float lastFrame = 0.0f; // 上一帧的时间
 
 // 摄像机配置
-glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
+// glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
+// glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+// glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
+Camera camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
+
 // 摄像机俯仰角
-glm::vec3 direction(1.0f);
-float yaw = -90.0f;
-float pitch = 0;
+// glm::vec3 direction(1.0f);
+// float yaw = -90.0f;
+// float pitch = 0;
+
 // 摄像机视野 Field of View
-float fov = 45.0f;
+// float fov = 45.0f;
 
 // 窗口配置
 int WINDOW_WIDTH = 800;
@@ -135,7 +138,7 @@ int main(){
     #endif
 
     // 创建窗口
-    GLFWwindow* window = glfwCreateWindow(800, 600, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "LearnOpenGL", NULL, NULL);
     if(window == NULL){
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -274,6 +277,10 @@ int main(){
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
+    else{
+        std::cout << "Failed to load texture: awesomeface.png" << std::endl;
+    }
+    stbi_image_free(data);
 
     // 设置片段着色器各纹理槽号
     // 这里是将着色器的材质指向材质的槽位（如果不指定，默认是0），即和glActiveTexture里面的GL_TEXTURE0对应
@@ -293,15 +300,16 @@ int main(){
 
     // 观察矩阵（世界坐标 => 观察坐标）
     glm::mat4 view;
-    view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    // view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+    view = camera.GetViewMatrix();
     ourShader.setMat4("view", view);
 
     // 投影矩阵（裁剪坐标 => 屏幕坐标）
     glm::mat4 projection(1.0f);
-    int screenWidth, screenHeight;
-    glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
+    // int screenWidth, screenHeight;
+    // glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
     // 正射投影使用glm::ortho，透视投影使用glm::perspective
-    projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f);
     ourShader.setMat4("projection", projection);
 
     // ============================================
@@ -339,10 +347,10 @@ int main(){
         // 每帧同步摄像机视角
         // 摄像机旋转
         glm::mat4 view;
-        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+        view = camera.GetViewMatrix();
         ourShader.setMat4("view", view);
         // 摄像机缩放
-        projection = glm::perspective(glm::radians(fov), (float)screenWidth / screenHeight, 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f);
         ourShader.setMat4("projection", projection);
 
         /* ================== 渲染指令放在下面 ================== */
@@ -386,6 +394,8 @@ int main(){
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);
+    glDeleteTextures(1, &texture1);
+    glDeleteTextures(1, &texture2);
     ourShader.destroy();
     glfwDestroyWindow(window);
 
@@ -397,7 +407,9 @@ int main(){
 // 回调函数framebuffer_size_callback：用于窗口大小发生变化时重新进行视口转换
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    glViewport(0, 0, width, height);
+    WINDOW_WIDTH = width;
+    WINDOW_HEIGHT = height;
+    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 }
 
 // 回调函数processInput：用于处理键盘行为
@@ -407,23 +419,24 @@ void processInput(GLFWwindow *window)
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    float cameraSpeed = deltaTime * 2.5f; // adjust accordingly
+    // 摄像机移动
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-        cameraPos += cameraSpeed * cameraFront;
+        camera.ProcessKeyboard(Camera_Movement::FORWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-        cameraPos -= cameraSpeed * cameraFront;
+        camera.ProcessKeyboard(Camera_Movement::BACKWARD, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        camera.ProcessKeyboard(Camera_Movement::LEFT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        camera.ProcessKeyboard(Camera_Movement::RIGHT, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        cameraPos -= cameraUp * cameraSpeed;
+        camera.ProcessKeyboard(Camera_Movement::DOWN, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-        cameraPos += cameraUp * cameraSpeed;
+        camera.ProcessKeyboard(Camera_Movement::UP, deltaTime);
 }
 
 // 回调函数mouse_callback：用于处理鼠标移动行为
 void mouse_callback(GLFWwindow* window, double xpos, double ypos){
+    // 防止第一次视角跳变
     if(firstMouse) // 这个bool变量初始时是设定为true的
     {
         lastX = xpos;
@@ -431,35 +444,17 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos){
         firstMouse = false;
     }
 
+    // 计算每帧鼠标偏离量
     float xoffset = xpos - lastX;
-    float yoffset = lastY - ypos; // 注意这里是相反的，因为y坐标是从底部往顶部依次增大的
+    float yoffset = lastY - ypos; // 注意这里是相反的，因为屏幕中y坐标是从底部往顶部依次增大的
     lastX = xpos;
     lastY = ypos;
 
-    float sensitivity = 0.05f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
-    yaw   += xoffset;
-    pitch += yoffset;
-
-    if(pitch > 89.0f)
-        pitch = 89.0f;
-    if(pitch < -89.0f)
-        pitch = -89.0f;
-
-    glm::vec3 front;
-    front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    front.y = sin(glm::radians(pitch));
-    front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    cameraFront = glm::normalize(front);
+    camera.ProcessMouseMovement(xoffset, yoffset, true);
 }
 
 // 回调函数mouse_callback：用于处理鼠标滚轮行为
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    fov -= (float)yoffset;
-    if (fov < 1.0f)
-        fov = 1.0f;
-    if (fov > 45.0f)
-        fov = 45.0f;
+    camera.ProcessMouseScroll(yoffset);
 }

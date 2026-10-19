@@ -35,7 +35,7 @@ OpenGL_Codes/
 
 ### 🚀 快速上手
 
-使用 **VS Code** 打开本项目，打开左侧栏的**运行与调试**（Ctrl+Shift+D），选择`Debug OpenGL (gdb)`或者`Release OpenGL (Run - O3)`，之后开始调试（F5）或者运行（Ctrl + F5），即可看到渲染出来的带有颜色的木箱材质矩形。
+使用 **VS Code** 打开本项目，打开左侧栏的**运行与调试**（Ctrl+Shift+D），选择`Debug OpenGL (gdb)`或者`Release OpenGL (Run - O3)`，之后开始调试（F5）或者运行（Ctrl + F5），即可看到渲染出来的10个带有笑脸的木箱材质矩形旋转，并可以使用WSAD空格Shift自由移动，并可通过鼠标晃动进行视角变换。
 
 弹出窗口后，可以点击右上角关闭窗口，也可以按下`Esc`键关闭窗口。
 
@@ -51,7 +51,6 @@ OpenGL_Codes/
 着色器源码建议存放在`assets\shaders`下，可以编写自己的着色器，里面存放了示例使用的顶点着色器和片段着色器，推荐配合插件 _Shader Studio_ 使用。
 
 着色器类在`include\Shader.h`下，完整定义了`Shader`类，目前支持顶点着色器、几何着色器（可选）和片段着色器三种，在`assets\shaders`下编写完着色器源码之后，使用源码的路径初始化Shader对象：
-
 
 ```cpp
 Shader ourShader('path/to/vertexShade.vert', 'path/to/fragmentShader.frag', 'path/to/geometryShader.geom');
@@ -75,6 +74,9 @@ include<stb_image.h>
 ```cpp
 stbi_set_flip_vertically_on_load(true); // 上下颠倒翻转读取
 ```
+
+### 🎥 摄像机
+摄像机类在`include\Camera.h`下，完整定义了`Camera`类，支持摄像机6个方向上的平移以及绕着x和y轴的旋转。旋转使用欧拉角表示，如若希望沿z方向旋转可以自行定义，未来或将使用四元数取代欧拉角以避免万向节死锁问题。
 
 ## 🎉 感谢
 
