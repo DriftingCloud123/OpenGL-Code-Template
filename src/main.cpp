@@ -26,7 +26,16 @@ float lastFrame = 0.0f; // 上一帧的时间
 // glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
 // glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 // glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
-Camera camera = Camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera = Camera(
+    // pos
+    glm::vec3(0.0f, 0.0f, 3.0f),
+    // Worldup
+    glm::vec3(0.0f, 1.0f, 0.0f),
+    // yaw
+    -90.0f,
+    //pitch
+    0.0f
+);
 
 // 摄像机俯仰角
 // glm::vec3 direction(1.0f);
@@ -47,62 +56,48 @@ bool firstMouse = true;
 // 顶点属性配置
 // 每个立方体的局部坐标
 float vertices[] = {
-//  --------位置--------  --材质坐标--
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+    // 位置 面的法向量
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
 
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
 
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
 
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
 
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
 
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-};
-
-// 正方体的世界坐标
-glm::vec3 cubePositions[] = {
-    glm::vec3( 0.0f,  0.0f,  0.0f), 
-    glm::vec3( 2.0f,  5.0f, -15.0f), 
-    glm::vec3(-1.5f, -2.2f, -2.5f),  
-    glm::vec3(-3.8f, -2.0f, -12.3f),  
-    glm::vec3( 2.4f, -0.4f, -3.5f),  
-    glm::vec3(-1.7f,  3.0f, -7.5f),  
-    glm::vec3( 1.3f, -2.0f, -2.5f),  
-    glm::vec3( 1.5f,  2.0f, -2.5f), 
-    glm::vec3( 1.5f,  0.2f, -1.5f), 
-    glm::vec3(-1.3f,  1.0f, -1.5f)  
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
 };
 
 // 绘图顺序索引，本模板如果不适用glDrawElements则无效
@@ -113,6 +108,9 @@ unsigned int indices[] = {
     0, 2, 3
 };
 
+
+// 光源位置
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 int main(){
 
@@ -183,7 +181,8 @@ int main(){
     // 着色器部分
     // ============================================
 
-    Shader ourShader("assets/shaders/shader.vert", "assets/shaders/shader.frag");
+    Shader CubeShader("assets/shaders/cube_shader.vert", "assets/shaders/cube_shader.frag");
+    Shader LighterShader("assets/shaders/lighter_shader.vert", "assets/shaders/lighter_shader.frag");
 
     // ============================================
     // 将数据传输到GPU并配置绘制说明
@@ -192,37 +191,39 @@ int main(){
     // VBO：顶点缓冲对象
     // VAO：顶点数组对象
     // EBO：索引顶点对象
-    unsigned int VAO, VBO, EBO;
-    glGenVertexArrays(1, &VAO);
+    unsigned int CubeVAO, VBO;
+    glGenVertexArrays(1, &CubeVAO);
     glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
     
     // 绑定VAO
-    glBindVertexArray(VAO);
+    glBindVertexArray(CubeVAO);
     // 复制顶点数组到缓冲中供OpenGL使用
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    // 绑定EBO
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
     // 把之前定义的顶点数据复制到缓冲的内存中
     // 将新建的VBO绑定到GL_ARRAY_BUFFER目标上
     // 此时对GL_ARRAY_BUFFER目标上的缓冲调用都会用来配置当前绑定的缓冲
     // GL_STATIC_DRAW意思是很少改变
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    // 将索引存到EBO中
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     
     // 设置顶点属性指针
     // 管理位置属性
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     // 开启VAO管理的第一个属性
     glEnableVertexAttribArray(0);
-
-
-    // 管理纹理坐标属性
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3* sizeof(float)));
+    // 管理法向量属性
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3* sizeof(float)));
     glEnableVertexAttribArray(1);
+    
+    // 设置灯的VAO
+    unsigned int LighterVAO;
+    glGenVertexArrays(1, &LighterVAO);
+    glBindVertexArray(LighterVAO);
+    // 只需要绑定VBO不用再次设置VBO的数据，因为箱子的VBO数据中已经包含了正确的立方体顶点数据
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    // 设置灯立方体的顶点属性（对我们的灯来说仅仅只有位置数据）
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
 
     /* 当我们渲染一个物体时要使用着色器程序 */
     // 绘制物体示例：
@@ -233,84 +234,41 @@ int main(){
     // 解绑，防止意外修改
     glBindVertexArray(0);   // 解绑VAO
     glBindBuffer(GL_ARRAY_BUFFER, 0);   // 上传数据到GPU并在VAO进行配置之后，可以解绑VBO，防止意外修改
-    // 不要单独解绑EBO，EBO绑定属于VAO状态，解绑会清掉VAO记录的索引缓冲，❌glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);   
-
-    // ============================================
-    // 设置纹理
-    // ============================================
-    // 生成纹理并绑定
-    unsigned int texture1, texture2;
-    glGenTextures(1, &texture1);
-    // 在绑定纹理之前先激活纹理单元槽位。纹理单元GL_TEXTURE0默认总是被激活，因而该行可以省略
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture1);
-    // 为当前绑定的纹理对象设置环绕、过滤方式
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);   
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // 加载并生成纹理
-    stbi_set_flip_vertically_on_load(true); // 上下颠倒翻转读取
-    int width, height, nrChannels;
-    unsigned char *data = stbi_load("assets/textures/container.jpg", &width, &height, &nrChannels, 0);
-    if (data){
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else{
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
-
-    // 第二张纹理
-    glGenTextures(1, &texture2);
-    glActiveTexture(GL_TEXTURE1); // 激活1号纹理单元
-    glBindTexture(GL_TEXTURE_2D, texture2);
-    // 为当前绑定的纹理对象设置环绕、过滤方式
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);   
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    data = stbi_load("assets/textures/awesomeface.png", &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else{
-        std::cout << "Failed to load texture: awesomeface.png" << std::endl;
-    }
-    stbi_image_free(data);
-
-    // 设置片段着色器各纹理槽号
-    // 这里是将着色器的材质指向材质的槽位（如果不指定，默认是0），即和glActiveTexture里面的GL_TEXTURE0对应
-    // 如果只有一个材质可以不绑定。但是如果要用多个材质，则需要绑定，否则会出错
-    ourShader.use();
-    ourShader.setInt("texture1", 0);
-    ourShader.setInt("texture2", 1);
 
     // 配置坐标变换矩阵
     // 局部坐标 => 世界坐标 => 观察坐标 => 裁剪坐标 => 屏幕坐标
     // 共需要三个矩阵：模型矩阵、观察矩阵和投影矩阵
-    ourShader.use();
-    // 模型矩阵（局部坐标 => 世界坐标）
+    CubeShader.use();
     glm::mat4 model(1.0f);
-    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-    ourShader.setMat4("model", model);
+    CubeShader.setMat4("model", model);
 
-    // 观察矩阵（世界坐标 => 观察坐标）
     glm::mat4 view;
-    // view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
     view = camera.GetViewMatrix();
-    ourShader.setMat4("view", view);
+    CubeShader.setMat4("view", view);
 
     // 投影矩阵（裁剪坐标 => 屏幕坐标）
     glm::mat4 projection(1.0f);
-    // int screenWidth, screenHeight;
-    // glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
-    // 正射投影使用glm::ortho，透视投影使用glm::perspective
     projection = glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f);
-    ourShader.setMat4("projection", projection);
+    CubeShader.setMat4("projection", projection);
+
+    CubeShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+    CubeShader.setVec3("lightColor",  1.0f, 1.0f, 1.0f);
+    // ========================================================================================================
+
+    LighterShader.use();
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, lightPos);
+    model = glm::scale(model, glm::vec3(0.2f));
+    LighterShader.setMat4("model", model);
+
+    view = camera.GetViewMatrix();
+    LighterShader.setMat4("view", view);
+
+    projection = glm::mat4(1.0f);
+    projection = glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f);
+    LighterShader.setMat4("projection", projection);
+
+    
 
     // ============================================
     // 准备绘制
@@ -348,39 +306,39 @@ int main(){
         // 摄像机旋转
         glm::mat4 view;
         view = camera.GetViewMatrix();
-        ourShader.setMat4("view", view);
         // 摄像机缩放
         projection = glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f);
-        ourShader.setMat4("projection", projection);
 
         /* ================== 渲染指令放在下面 ================== */
 
         // 清理背景并重新渲染
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);   // 设置背景渲染颜色
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);   // 设置背景渲染颜色
+        // glClearColor(0.5f, 0.5f, 0.5f, 1.0f);   // 设置背景渲染颜色
         // glClear(GL_COLOR_BUFFER_BIT);           // 清空背景并重新渲染指定颜色
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     // 清空背景并重新渲染指定颜色，同时清空深度缓冲
-        // 绘制前绑定
-        ourShader.use();
 
-        // 这里绑定VAO即可，VAO已记录属性数据源(VBO)与索引缓冲(EBO)
-        // 同时绑定VAO会自动切换EBO绑定
-        glBindVertexArray(VAO);
-        // glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        // change the light's position values over time (can be done anywhere in the render loop actually, but try to do it at least before using the light source positions)
+        lightPos.x = 1.0f + sin(glfwGetTime()) * 2.5f;
+        lightPos.y = cos(glfwGetTime()) * 2.5f;
 
-        // 绘制(使用glDrawElements如果没有配置EBO，可以手动指定indices数组，为0则使用配置的EBO)
-        // glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(indices[0]), GL_UNSIGNED_INT, 0/*indices*/);
+        // 绘制物体
+        CubeShader.use();
+        CubeShader.setMat4("view", view);
+        CubeShader.setMat4("projection", projection);
+        CubeShader.setVec3("lightPos", lightPos);
+        CubeShader.setVec3("viewPos", camera.Position);
+        glBindVertexArray(CubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        for(unsigned int i = 0; i < 10; i++){
-            glm::mat4 model(1.0f);
-            model = glm::translate(model, cubePositions[i]);
-            float angle = 20.0f * i; 
-            model = glm::rotate(model, glm::radians(angle)+(float)glfwGetTime(), glm::vec3(1.0f, 0.3f, 0.5f));
-            ourShader.setMat4("model", model);
-
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
+        LighterShader.use();
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, lightPos);
+        model = glm::scale(model, glm::vec3(0.2f));
+        LighterShader.setMat4("model", model);
+        LighterShader.setMat4("view", view);
+        LighterShader.setMat4("projection", projection);
+        glBindVertexArray(LighterVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // 交换缓冲并检查调用事件
         glfwSwapBuffers(window);
@@ -391,12 +349,10 @@ int main(){
     // ============================================
     // 清除资源
     // ============================================
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
-    glDeleteTextures(1, &texture1);
-    glDeleteTextures(1, &texture2);
-    ourShader.destroy();
+    glDeleteVertexArrays(1, &LighterVAO);
+    glDeleteBuffers(1, &CubeVAO);
+    LighterShader.destroy();
+    CubeShader.destroy();
     glfwDestroyWindow(window);
 
     glfwTerminate();
