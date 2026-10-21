@@ -56,48 +56,48 @@ bool firstMouse = true;
 // 顶点属性配置
 // 每个立方体的局部坐标
 float vertices[] = {
-    // 位置 面的法向量
-    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
-    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+    // positions          // normals           // texture coords
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
 
-    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
 
-    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
-    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
-    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
 
-    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
 
-    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 };
 
 // 绘图顺序索引，本模板如果不适用glDrawElements则无效
@@ -110,7 +110,8 @@ unsigned int indices[] = {
 
 
 // 光源位置
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+// glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+glm::vec3 lightPos(1.5f, 1.0f, 2.0f);
 
 int main(){
 
@@ -208,12 +209,15 @@ int main(){
     
     // 设置顶点属性指针
     // 管理位置属性
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     // 开启VAO管理的第一个属性
     glEnableVertexAttribArray(0);
     // 管理法向量属性
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3* sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3* sizeof(float)));
     glEnableVertexAttribArray(1);
+    // 管理纹理坐标属性
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6* sizeof(float)));
+    glEnableVertexAttribArray(2);
     
     // 设置灯的VAO
     unsigned int LighterVAO;
@@ -222,7 +226,7 @@ int main(){
     // 只需要绑定VBO不用再次设置VBO的数据，因为箱子的VBO数据中已经包含了正确的立方体顶点数据
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     // 设置灯立方体的顶点属性（对我们的灯来说仅仅只有位置数据）
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
     /* 当我们渲染一个物体时要使用着色器程序 */
@@ -234,6 +238,60 @@ int main(){
     // 解绑，防止意外修改
     glBindVertexArray(0);   // 解绑VAO
     glBindBuffer(GL_ARRAY_BUFFER, 0);   // 上传数据到GPU并在VAO进行配置之后，可以解绑VBO，防止意外修改
+
+    // ============================================
+    // 设置纹理
+    // ============================================
+    // 生成漫反射纹理
+    unsigned int diffuseMap;
+    glGenTextures(1, &diffuseMap);
+    
+    glActiveTexture(GL_TEXTURE0);   // 激活槽位
+    glBindTexture(GL_TEXTURE_2D, diffuseMap);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);   
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    stbi_set_flip_vertically_on_load(true); // 上下颠倒翻转读取
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load("assets/textures/container2.png", &width, &height, &nrChannels, 0);
+    if (data){
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        std::cout << nrChannels << std::endl;
+    }
+    else{
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
+    unsigned int specularMap;
+    glGenTextures(1, &specularMap);
+    
+    glActiveTexture(GL_TEXTURE1);   // 激活槽位
+    glBindTexture(GL_TEXTURE_2D, specularMap);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);   
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    stbi_set_flip_vertically_on_load(true); // 上下颠倒翻转读取
+
+    data = stbi_load("assets/textures/container2_specular.png", &width, &height, &nrChannels, 0);
+    if (data){
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        std::cout << nrChannels << std::endl;
+    }
+    else{
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
+    CubeShader.use();
+    CubeShader.setInt("material.diffuse", 0);
+    CubeShader.setInt("material.specular", 1);
 
     // 配置坐标变换矩阵
     // 局部坐标 => 世界坐标 => 观察坐标 => 裁剪坐标 => 屏幕坐标
@@ -260,9 +318,9 @@ int main(){
     // ========================================================================================================
     // 设置物体材质
     CubeShader.use();
-    CubeShader.setVec3("material.ambient",  1.0f, 0.5f, 0.31f);
-    CubeShader.setVec3("material.diffuse",  1.0f, 0.5f, 0.31f);
-    CubeShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+    // CubeShader.setVec3("material.ambient",  1.0f, 0.5f, 0.31f);
+    // CubeShader.setVec3("material.diffuse",  1.0f, 0.5f, 0.31f);
+    // CubeShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
     CubeShader.setFloat("material.shininess", 32.0f);
 
     LighterShader.use();
@@ -278,9 +336,6 @@ int main(){
     projection = glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f);
     LighterShader.setMat4("projection", projection);
 
-
-    
-
     // ============================================
     // 准备绘制
     // ============================================
@@ -290,11 +345,10 @@ int main(){
     // 注册视口转换函数，每当窗口调整大小的时候调用这个函数
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    // 隐藏光标并捕捉
+    // 隐藏鼠标光标并捕捉
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    // 注册光标函数，每当光标移动的时候调用这个函数
+    // 注册鼠标光标函数，每当光标移动的时候调用这个函数
     glfwSetCursorPosCallback(window, mouse_callback);
-
     // 注册滚轮函数，同理
     glfwSetScrollCallback(window, scroll_callback);
 
@@ -323,14 +377,16 @@ int main(){
         /* ================== 渲染指令放在下面 ================== */
 
         // 清理背景并重新渲染
-        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);   // 设置背景渲染颜色
+        // glClearColor(0.0f, 0.0f, 0.0f, 1.0f);   // 设置背景渲染颜色
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);   // 设置背景渲染颜色
         // glClearColor(0.5f, 0.5f, 0.5f, 1.0f);   // 设置背景渲染颜色
         // glClear(GL_COLOR_BUFFER_BIT);           // 清空背景并重新渲染指定颜色
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     // 清空背景并重新渲染指定颜色，同时清空深度缓冲
 
         // change the light's position values over time (can be done anywhere in the render loop actually, but try to do it at least before using the light source positions)
-        lightPos.x = 1.0f + sin(glfwGetTime()) * 0.5f;
-        lightPos.y = cos(glfwGetTime()) * 0.5f;
+        // lightPos.x = sin(glfwGetTime()) * 1.5f;
+        // lightPos.y = sin(glfwGetTime() / 1.5f) * 1.5f;
+        // lightPos.z = cos(glfwGetTime()) * 1.5f;
 
         // 绘制物体
         CubeShader.use();
@@ -340,16 +396,16 @@ int main(){
         CubeShader.setVec3("viewPos", camera.Position);
         glBindVertexArray(CubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
-        glm::vec3 lightColor;
-        lightColor.x = sin(glfwGetTime() * 2.0f);
-        lightColor.y = sin(glfwGetTime() * 0.7f);
-        lightColor.z = sin(glfwGetTime() * 1.3f);
+        // glm::vec3 lightColor;
+        // lightColor.x = sin(glfwGetTime() * 2.0f);
+        // lightColor.y = sin(glfwGetTime() * 0.7f);
+        // lightColor.z = sin(glfwGetTime() * 1.3f);
 
-        glm::vec3 diffuseColor = lightColor   * glm::vec3(0.5f); // 降低影响
-        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // 很低的影响
+        // glm::vec3 diffuseColor = lightColor   * glm::vec3(0.5f); // 降低影响
+        // glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // 很低的影响
 
-        CubeShader.setVec3("light.ambient", ambientColor);
-        CubeShader.setVec3("light.diffuse", diffuseColor);
+        // CubeShader.setVec3("light.ambient", ambientColor);
+        // CubeShader.setVec3("light.diffuse", diffuseColor);
 
         LighterShader.use();
         model = glm::mat4(1.0f);
@@ -409,6 +465,19 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(Camera_Movement::DOWN, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
         camera.ProcessKeyboard(Camera_Movement::UP, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS){
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        firstMouse = false;
+        glfwSetCursorPosCallback(window, NULL);
+        glfwSetScrollCallback(window, NULL);
+    }
+    if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_RELEASE){
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        firstMouse = false;
+        glfwSetCursorPosCallback(window, mouse_callback);
+        glfwSetScrollCallback(window, scroll_callback);
+    }
+        
 }
 
 // 回调函数mouse_callback：用于处理鼠标移动行为
@@ -419,6 +488,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos){
         lastX = xpos;
         lastY = ypos;
         firstMouse = false;
+        return;
     }
 
     // 计算每帧鼠标偏离量
