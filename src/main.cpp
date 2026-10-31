@@ -7,6 +7,7 @@
 #include <stb_image.h>   // 图片处理
 #include "Shader.h"      // 着色器
 #include "Camera.h"      // 摄像机
+#include "Model.h"       // 模型
 // 数学库
 #include <cmath>
 #include <glm/glm.hpp>
@@ -19,12 +20,6 @@ void processInput(GLFWwindow *window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
-// 工具函数
-unsigned int loadTexture(char const * path);
-
-// 帧时间记录
-float deltaTime = 0.0f; // 当前帧与上一帧的时间差
-float lastFrame = 0.0f; // 上一帧的时间
 
 // 摄像机
 Camera camera = Camera(
@@ -39,82 +34,19 @@ Camera camera = Camera(
 );
 
 // 窗口配置
-int WINDOW_WIDTH = 800;
-int WINDOW_HEIGHT = 600;
-float lastX = WINDOW_WIDTH / 2.0f, lastY = WINDOW_HEIGHT / 2.0f;
+unsigned int SCR_WIDTH = 800;
+unsigned int SCR_HEIGHT = 600;
+
+float lastX = SCR_WIDTH / 2.0f;
+float lastY = SCR_HEIGHT / 2.0f;
 
 // 鼠标追踪
 bool firstMouse = true;
 
-// 顶点属性配置
-// 每个立方体的局部坐标
-float vertices[] = {
-    // positions          // normals           // texture coords
-    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,  0.0f, 0.0f,
 
-    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,   0.0f, 0.0f,
-
-    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-
-     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f,
-
-    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,  0.0f, 1.0f,
-
-    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
-};
-
-// 箱子位置
-glm::vec3 cubePositions[] = {
-    glm::vec3( 0.0f,  0.0f,  0.0f),
-    glm::vec3( 2.0f,  5.0f, -15.0f),
-    glm::vec3(-1.5f, -2.2f, -2.5f),
-    glm::vec3(-3.8f, -2.0f, -12.3f),
-    glm::vec3( 2.4f, -0.4f, -3.5f),
-    glm::vec3(-1.7f,  3.0f, -7.5f),
-    glm::vec3( 1.3f, -2.0f, -2.5f),
-    glm::vec3( 1.5f,  2.0f, -2.5f),
-    glm::vec3( 1.5f,  0.2f, -1.5f),
-    glm::vec3(-1.3f,  1.0f, -1.5f)
-};
-
-
-// 光源位置
-glm::vec3 pointLightPositions[] = {
-    glm::vec3( 0.7f,  0.2f,  2.0f),
-    glm::vec3( 2.3f, -3.3f, -4.0f),
-    glm::vec3(-4.0f,  2.0f, -12.0f),
-    glm::vec3( 0.0f,  0.0f, -3.0f)
-};
+// 帧时间记录
+float deltaTime = 0.0f; // 当前帧与上一帧的时间差
+float lastFrame = 0.0f; // 上一帧的时间
 
 int main(){
 
@@ -140,7 +72,7 @@ int main(){
     #endif
 
     // 创建窗口
-    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
     if(window == NULL){
         std::cout << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -148,6 +80,15 @@ int main(){
     }
 	// 将窗口的上下文设置为当前线程的主上下文
     glfwMakeContextCurrent(window);
+    // 注册视口转换函数，每当窗口调整大小的时候调用这个函数
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    // 隐藏鼠标光标并捕捉
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // 注册鼠标光标函数，每当光标移动的时候调用这个函数
+    glfwSetCursorPosCallback(window, mouse_callback);
+    // 注册滚轮函数，同理
+    glfwSetScrollCallback(window, scroll_callback);
+
 
     // 初始化glad
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -157,214 +98,21 @@ int main(){
         glfwTerminate();
         return -1;
     }
-
+    stbi_set_flip_vertically_on_load(true);
+    
     // 设置绘图模式(默认是GL_FILL)
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     // 开启深度测试
     glEnable(GL_DEPTH_TEST);
-
-    // do something
-    // 从坐标到图形的一般顺序：
-    // 顶点着色器 → 图元装配 → 光栅化 → 片段着色器 → 深度测试/混合 → 像素
-    /*
-     * 参考内容：
-     ┌────────────────这部分已被类封装────────────────
-     |* 顶点着色器源码字符串
-     |* 片段着色器源码字符串
-     |* 编译顶点着色器
-     |* 编译片段着色器
-     |* 创建着色器程序，链接，检查错误
-     |* 删除着色器对象
-     └───────────────────────────────────────────────
-     * 创建 VAO 和 VBO，上传顶点数据，配置顶点属性与绘制索引
-     * 进入渲染循环：每帧 glUseProgram、绑定 VAO、glDrawArrays/glDrawElements
-     * 循环结束后清理：删除 VAO、VBO、着色器程序
-     */
-
-    // ============================================
-    // 着色器部分
-    // ============================================
-
-    Shader CubeShader("assets/shaders/cube_shader.vert", "assets/shaders/cube_shader.frag");
-    Shader LighterShader("assets/shaders/lighter_shader.vert", "assets/shaders/lighter_shader.frag");
-
-    // ============================================
-    // 将数据传输到GPU并配置绘制说明
-    // ============================================
-    // 创建VBO、VAO、EBO
-    // VBO：顶点缓冲对象
-    // VAO：顶点数组对象
-    // EBO：索引顶点对象
-    unsigned int CubeVAO, VBO;
-    glGenVertexArrays(1, &CubeVAO);
-    glGenBuffers(1, &VBO);
     
-    // 绑定VAO
-    glBindVertexArray(CubeVAO);
-    // 复制顶点数组到缓冲中供OpenGL使用
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
-    // 把之前定义的顶点数据复制到缓冲的内存中
-    // 将新建的VBO绑定到GL_ARRAY_BUFFER目标上
-    // 此时对GL_ARRAY_BUFFER目标上的缓冲调用都会用来配置当前绑定的缓冲
-    // GL_STATIC_DRAW意思是很少改变
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    
-    // 设置顶点属性指针
-    // 管理位置属性
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    // 开启VAO管理的第一个属性
-    glEnableVertexAttribArray(0);
-    // 管理法向量属性
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3* sizeof(float)));
-    glEnableVertexAttribArray(1);
-    // 管理纹理坐标属性
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6* sizeof(float)));
-    glEnableVertexAttribArray(2);
-    
-    // 设置灯的VAO
-    unsigned int LighterVAO;
-    glGenVertexArrays(1, &LighterVAO);
-    glBindVertexArray(LighterVAO);
-    // 只需要绑定VBO不用再次设置VBO的数据，因为箱子的VBO数据中已经包含了正确的立方体顶点数据
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    // 设置灯立方体的顶点属性（对我们的灯来说仅仅只有位置数据）
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+    // 编译着色器
 
-    /* 当我们渲染一个物体时要使用着色器程序 */
-    // 绘制物体示例：
-    // glUseProgram(shaderProgram);
-    // glBindVertexArray(VAO);
-    // someOpenGLFunctionThatDrawsOurTriangle();
-    
-    // 解绑，防止意外修改
-    glBindVertexArray(0);   // 解绑VAO
-    glBindBuffer(GL_ARRAY_BUFFER, 0);   // 上传数据到GPU并在VAO进行配置之后，可以解绑VBO，防止意外修改
+    Shader ourShader("assets/shaders/model.vert", "assets/shaders/model.frag");
 
-    // ============================================
-    // 设置纹理
-    // ============================================
-    // 生成漫反射纹理
-    // 漫反射贴图要与 container2_specular.png 使用同一套 UV 内容
-    unsigned int diffuseMap = loadTexture("assets/textures/container2.png");
-
-    // 生成镜面反射纹理
-    unsigned int specularMap = loadTexture("assets/textures/container2_specular.png");
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, diffuseMap);
-
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, specularMap);
-
-
-    CubeShader.use();
-    CubeShader.setInt("material.diffuse", 0);
-    CubeShader.setInt("material.specular", 1);
-    
-
-    // 配置坐标变换矩阵
-    // 局部坐标 => 世界坐标 => 观察坐标 => 裁剪坐标 => 屏幕坐标
-    // 共需要三个矩阵：模型矩阵、观察矩阵和投影矩阵
-    CubeShader.use();
-    glm::mat4 model(1.0f);
-    CubeShader.setMat4("model", model);
-
-    glm::mat4 view;
-    view = camera.GetViewMatrix();
-    CubeShader.setMat4("view", view);
-
-    // 投影矩阵（裁剪坐标 => 屏幕坐标）
-    glm::mat4 projection(1.0f);
-    projection = glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f);
-    CubeShader.setMat4("projection", projection);
-
-     
-    // ========================================================================================================
-    // 设置物体材质
-    CubeShader.use();
-    CubeShader.setVec3("material.ambient",  1.0f, 0.5f, 0.31f);
-    CubeShader.setVec3("material.diffuse",  1.0f, 0.5f, 0.31f);
-    CubeShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-    CubeShader.setFloat("material.shininess", 32.0f);
-
-    // directional light
-    CubeShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
-    CubeShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
-    CubeShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
-    CubeShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
-    // point light 1
-    CubeShader.setVec3("pointLights[0].position", pointLightPositions[0]);
-    CubeShader.setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
-    CubeShader.setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
-    CubeShader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
-    CubeShader.setFloat("pointLights[0].constant", 1.0f);
-    CubeShader.setFloat("pointLights[0].linear", 0.09f);
-    CubeShader.setFloat("pointLights[0].quadratic", 0.032f);
-    // point light 2
-    CubeShader.setVec3("pointLights[1].position", pointLightPositions[1]);
-    CubeShader.setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
-    CubeShader.setVec3("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
-    CubeShader.setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
-    CubeShader.setFloat("pointLights[1].constant", 1.0f);
-    CubeShader.setFloat("pointLights[1].linear", 0.09f);
-    CubeShader.setFloat("pointLights[1].quadratic", 0.032f);
-    // point light 3
-    CubeShader.setVec3("pointLights[2].position", pointLightPositions[2]);
-    CubeShader.setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
-    CubeShader.setVec3("pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
-    CubeShader.setVec3("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
-    CubeShader.setFloat("pointLights[2].constant", 1.0f);
-    CubeShader.setFloat("pointLights[2].linear", 0.09f);
-    CubeShader.setFloat("pointLights[2].quadratic", 0.032f);
-    // point light 4
-    CubeShader.setVec3("pointLights[3].position", pointLightPositions[3]);
-    CubeShader.setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
-    CubeShader.setVec3("pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
-    CubeShader.setVec3("pointLights[3].specular", 1.0f, 1.0f, 1.0f);
-    CubeShader.setFloat("pointLights[3].constant", 1.0f);
-    CubeShader.setFloat("pointLights[3].linear", 0.09f);
-    CubeShader.setFloat("pointLights[3].quadratic", 0.032f);
-    // spotLight
-    CubeShader.setVec3("spotLight.position", camera.Position);
-    CubeShader.setVec3("spotLight.direction", camera.Front);
-    CubeShader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
-    CubeShader.setVec3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
-    CubeShader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
-    CubeShader.setFloat("spotLight.constant", 1.0f);
-    CubeShader.setFloat("spotLight.linear", 0.09f);
-    CubeShader.setFloat("spotLight.quadratic", 0.032f);
-    CubeShader.setFloat("spotLight.innerCutOff", glm::cos(glm::radians(12.5f)));
-    CubeShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));   
-
-    LighterShader.use();
-    model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(0.2f));
-    LighterShader.setMat4("model", model);
-
-    view = camera.GetViewMatrix();
-    LighterShader.setMat4("view", view);
-
-    projection = glm::mat4(1.0f);
-    projection = glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f);
-    LighterShader.setMat4("projection", projection);
-
-    // ============================================
-    // 准备绘制
-    // ============================================
-
-    // 设置视口的尺寸，OpenGL从(-1, 1)进行坐标映射
-    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-    // 注册视口转换函数，每当窗口调整大小的时候调用这个函数
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-    // 隐藏鼠标光标并捕捉
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    // 注册鼠标光标函数，每当光标移动的时候调用这个函数
-    glfwSetCursorPosCallback(window, mouse_callback);
-    // 注册滚轮函数，同理
-    glfwSetScrollCallback(window, scroll_callback);
+    // 加载模型
+    Model ourModel("assets/models/backpack/backpack.obj");
 
     // ============================================
     // 进入渲染循环
@@ -377,59 +125,25 @@ int main(){
         processInput(window);
 
         // 计算每帧时间差用于平衡不同设备摄像机速度
-        float currentFrame = glfwGetTime();
+        float currentFrame = (float)glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        // 每帧同步摄像机视角
-        // 摄像机旋转
-        glm::mat4 view;
-        view = camera.GetViewMatrix();
-        // 摄像机缩放
-        projection = glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f);
-
-        /* ================== 渲染指令放在下面 ================== */
-
-        // 清理背景并重新渲染
-        // glClearColor(0.0f, 0.0f, 0.0f, 1.0f);   // 设置背景渲染颜色
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);   // 设置背景渲染颜色
-        // glClearColor(0.5f, 0.5f, 0.5f, 1.0f);   // 设置背景渲染颜色
-        // glClear(GL_COLOR_BUFFER_BIT);           // 清空背景并重新渲染指定颜色
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     // 清空背景并重新渲染指定颜色，同时清空深度缓冲
 
+        ourShader.use();
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 view = camera.GetViewMatrix();
+        ourShader.setMat4("projection", projection);
+        ourShader.setMat4("view", view);
 
-        // 绘制物体
-        CubeShader.use();
-        CubeShader.setMat4("view", view);
-        CubeShader.setMat4("projection", projection);
-        CubeShader.setVec3("viewPos", camera.Position);
-
-        CubeShader.setVec3("spotLight.direction", camera.Front);
-        CubeShader.setVec3("spotLight.position", camera.Position);
-
-        glBindVertexArray(CubeVAO);
-        for(int i = 0; i < 10; i++){
-            CubeShader.use();
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, cubePositions[i]);
-            float angle = 20.0f * i;
-            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            CubeShader.setMat4("model", model);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
-
-        // 绘制光源
-        LighterShader.use();
-        LighterShader.setMat4("view", view);
-        LighterShader.setMat4("projection", projection);
-        glBindVertexArray(LighterVAO);
-        for(int i = 0; i < 4; i++){
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, pointLightPositions[i]);
-            model = glm::scale(model, glm::vec3(0.2f));
-            LighterShader.setMat4("model", model);
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
+        // 渲染加载的模型
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // 中心位置
+        model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
+        ourShader.setMat4("model", model);
+        ourModel.Draw(ourShader);
 
         // 交换缓冲并检查调用事件
         glfwSwapBuffers(window);
@@ -440,12 +154,7 @@ int main(){
     // ============================================
     // 清除资源
     // ============================================
-    glDeleteVertexArrays(1, &LighterVAO);
-    glDeleteBuffers(1, &CubeVAO);
-    LighterShader.destroy();
-    CubeShader.destroy();
     glfwDestroyWindow(window);
-
     glfwTerminate();
 
     return 0;
@@ -454,9 +163,10 @@ int main(){
 // 回调函数framebuffer_size_callback：用于窗口大小发生变化时重新进行视口转换
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
-    WINDOW_WIDTH = width;
-    WINDOW_HEIGHT = height;
-    glViewport(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+    SCR_WIDTH = width;
+    SCR_HEIGHT = height;
+    // 设置视口的尺寸，OpenGL从(-1, 1)进行坐标映射
+    glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 }
 
 // 回调函数processInput：用于处理键盘行为
@@ -481,7 +191,7 @@ void processInput(GLFWwindow *window)
         camera.ProcessKeyboard(Camera_Movement::UP, deltaTime);
     if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS){
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        firstMouse = false;
+        firstMouse = true;
         glfwSetCursorPosCallback(window, NULL);
         glfwSetScrollCallback(window, NULL);
     }
@@ -518,43 +228,4 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos){
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
     camera.ProcessMouseScroll(yoffset);
-}
-
-
-// utility function for loading a 2D texture from file
-unsigned int loadTexture(char const * path)
-{
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
-
-    int width, height, nrComponents;
-    unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
-    if (data)
-    {
-        GLenum format;
-        if (nrComponents == 1)
-            format = GL_RED;
-        else if (nrComponents == 3)
-            format = GL_RGB;
-        else if (nrComponents == 4)
-            format = GL_RGBA;
-
-        glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-        stbi_image_free(data);
-    }
-    else
-    {
-        std::cout << "Texture failed to load at path: " << path << std::endl;
-        stbi_image_free(data);
-    }
-
-    return textureID;
 }

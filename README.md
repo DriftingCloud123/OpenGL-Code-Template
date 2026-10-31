@@ -18,6 +18,7 @@ OpenGL_Codes/
 │   │   └── shader.frag         # 示例片段着色器
 │   └── textures/               # 实验贴图图片素材 (.jpg, .png)
 ├── build/                      # 编译输出目录
+│   ├── cmake/                  # CMake 构建目录（生成物）
 │   └── .gitkeep
 ├── include/                    # 存放自定义模块头文件
 │   └── Shader.h                # 标准着色器加载与编译辅助类
@@ -39,12 +40,34 @@ OpenGL_Codes/
 
 弹出窗口后，可以点击右上角关闭窗口，也可以按下`Esc`键关闭窗口。
 
-### ⚙️ 编写项目
-在`src`下编写源码，项目会将`src`下的所有cpp文件以及`vendor\src`下的第三方源码一起自动编译，最终放到`build`下
+### 🧰 使用 CMake 构建
 
-编译成功的`exe`文件需在根目录下进行运行，否则会找不到相关资源，如：
+项目自带 [CMakeLists.txt](./CMakeLists.txt)，推荐使用 CMake 构建（需 CMake 3.16+ 与 MinGW-w64）。构建目录固定为 `build/cmake`，与 `build` 下的其他文件互不干扰：
+
 ```bash
-.\build\main.exe
+# 配置（Debug 可改为 -DCMAKE_BUILD_TYPE=Debug）
+cmake -S . -B build/cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release
+
+# 编译
+cmake --build build/cmake -j
+```
+
+构建产物为 `build/cmake/main.exe`，构建后会自动把 `assets` 复制到 `build/cmake/assets`，因此可直接运行：
+
+```bash
+.\build\cmake\main.exe
+```
+
+在 VS Code 中也可以直接按 F5 / Ctrl+F5，`tasks.json` 与 `launch.json` 已配置为自动执行 CMake 配置与构建。
+
+> 若使用 Visual Studio 生成器，可省略 `-G "MinGW Makefiles"`，改用 `cmake --build build/cmake --config Release`。
+
+### ⚙️ 编写项目
+在`src`下编写源码，项目会将`src`下的所有cpp文件以及`vendor\src`下的第三方源码一起自动编译，最终放到`build\cmake`下
+
+编译成功的`exe`文件需在构建目录下进行运行，否则会找不到相关资源，如：
+```bash
+.\build\cmake\main.exe
 ```
 
 ### 🔥 着色器
@@ -65,7 +88,6 @@ ourShader.destroy() //相当于glDeleteProgram
 
 ### 🧱 材质
 材质资源（图片等）建议存放在`assets\textures`下，存放自定义材质。
-
 为方面读取，项目加入了`stb image`库，存放在`vendor\include\stb_image.h`下，同时对应的源文件也存放在src下，使用时直接在`main.cpp`下引用头文件即可：
 ```cpp
 include<stb_image.h>
@@ -74,6 +96,31 @@ include<stb_image.h>
 ```cpp
 stbi_set_flip_vertically_on_load(true); // 上下颠倒翻转读取
 ```
+
+### 📦 模型加载（Assimp）
+
+项目已内置 **Assimp v6.0.5**（静态库，MinGW-w64 构建）：
+
+- 头文件：`vendor\include\assimp\`
+- 静态库：`vendor\lib\libassimp.a`（依赖 `vendor\lib\libzlibstatic.a`）
+- 模型资源建议放在 `assets\models\` 下
+
+`CMakeLists.txt` 已自动链接 `assimp`、`zlibstatic`、`ole32`、`uuid`，直接包含头文件即可使用：
+
+```cpp
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
+Assimp::Importer importer;
+const aiScene* scene = importer.ReadFile("assets/models/backpack/backpack.obj",
+    aiProcess_Triangulate | aiProcess_FlipUVs);
+if (!scene || !scene->mRootNode) {
+    std::cerr << importer.GetErrorString() << std::endl;
+}
+```
+
+> 注意：`aiProcess_FlipUVs` 用于抵消 OpenGL 纹理坐标上下颠倒；模型路径相对于运行目录（`build\cmake`），因此资源需放在 `assets` 下并随构建复制。
 
 ### 🎥 摄像机
 摄像机类在`include\Camera.h`下，完整定义了`Camera`类，支持摄像机6个方向上的平移以及绕着x和y轴的旋转。旋转使用欧拉角表示，如若希望沿z方向旋转可以自行定义，未来或将使用四元数取代欧拉角以避免万向节死锁问题。

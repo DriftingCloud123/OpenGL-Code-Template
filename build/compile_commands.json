@@ -1,0 +1,17 @@
+[
+{
+  "directory": "E:/workspace/OpenGL_Codes/chapter3/build",
+  "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -O3 -DNDEBUG -Wall -Wextra -std=c++17 -o CMakeFiles\\main.dir\\src\\main.cpp.obj -c E:\\workspace\\OpenGL_Codes\\chapter3\\src\\main.cpp",
+  "file": "E:/workspace/OpenGL_Codes/chapter3/src/main.cpp"
+},
+{
+  "directory": "E:/workspace/OpenGL_Codes/chapter3/build",
+  "command": "C:\\mingw64\\bin\\gcc.exe  @CMakeFiles/main.dir/includes_C.rsp -O3 -DNDEBUG -Wall -Wextra -o CMakeFiles\\main.dir\\vendor\\src\\glad.c.obj -c E:\\workspace\\OpenGL_Codes\\chapter3\\vendor\\src\\glad.c",
+  "file": "E:/workspace/OpenGL_Codes/chapter3/vendor/src/glad.c"
+},
+{
+  "directory": "E:/workspace/OpenGL_Codes/chapter3/build",
+  "command": "C:\\mingw64\\bin\\g++.exe  @CMakeFiles/main.dir/includes_CXX.rsp -O3 -DNDEBUG -Wall -Wextra -std=c++17 -o CMakeFiles\\main.dir\\vendor\\src\\stb_image.cpp.obj -c E:\\workspace\\OpenGL_Codes\\chapter3\\vendor\\src\\stb_image.cpp",
+  "file": "E:/workspace/OpenGL_Codes/chapter3/vendor/src/stb_image.cpp"
+}
+]

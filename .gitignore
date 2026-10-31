@@ -4,6 +4,9 @@ build/*.o
 build/*.pdb
 !build/.gitkeep
 
+# CMake 生成文件（构建目录为 build/cmake）
+build/cmake/
+
 # VS Code 本地索引与临时文件
 .vscode/.browse.VC.db*
 .vscode/*.log

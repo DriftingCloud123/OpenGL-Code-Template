@@ -1,0 +1,1 @@
+  -LE:/workspace/OpenGL_Codes/chapter3/vendor/lib  -lglfw3 -lopengl32 -lgdi32 -lassimp -lzlibstatic -lole32 -luuid -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32 

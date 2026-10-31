@@ -3,21 +3,48 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "Build OpenGL Project (Debug)",
-            "command": "g++",
+            "label": "CMake Configure (Debug)",
+            "command": "cmake",
             "args": [
-                "-g",
-                "-std=c++17",
-                "${workspaceFolder}/vendor/src/*.c*",
-                "${workspaceFolder}/src/*.cpp",
-                "-o",
-                "${workspaceFolder}/build/main.exe",
-                "-I${workspaceFolder}/include",
-                "-I${workspaceFolder}/vendor/include",
-                "-L${workspaceFolder}/vendor/lib",
-                "-lglfw3",
-                "-lopengl32",
-                "-lgdi32"
+                "-S",
+                "${workspaceFolder}",
+                "-B",
+                "${workspaceFolder}/build/cmake",
+                "-G",
+                "MinGW Makefiles",
+                "-DCMAKE_BUILD_TYPE=Debug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "type": "shell",
+            "label": "CMake Configure (Release)",
+            "command": "cmake",
+            "args": [
+                "-S",
+                "${workspaceFolder}",
+                "-B",
+                "${workspaceFolder}/build/cmake",
+                "-G",
+                "MinGW Makefiles",
+                "-DCMAKE_BUILD_TYPE=Release"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "type": "shell",
+            "label": "Build OpenGL Project (Debug)",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "${workspaceFolder}/build/cmake",
+                "-j"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -27,26 +54,17 @@
                 "kind": "build",
                 "isDefault": true
             },
+            "dependsOn": "CMake Configure (Debug)",
             "detail": "Debug 构建：包含 -g 调试信息，用于断点排错"
         },
         {
             "type": "shell",
             "label": "Build OpenGL Project (Release)",
-            "command": "g++",
+            "command": "cmake",
             "args": [
-                "-O3",
-                "-DNDEBUG",
-                "-std=c++17",
-                "${workspaceFolder}/vendor/src/*.c*",
-                "${workspaceFolder}/src/*.cpp",
-                "-o",
-                "${workspaceFolder}/build/main.exe",
-                "-I${workspaceFolder}/include",
-                "-I${workspaceFolder}/vendor/include",
-                "-L${workspaceFolder}/vendor/lib",
-                "-lglfw3",
-                "-lopengl32",
-                "-lgdi32"
+                "--build",
+                "${workspaceFolder}/build/cmake",
+                "-j"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -55,6 +73,7 @@
             "group": {
                 "kind": "build"
             },
+            "dependsOn": "CMake Configure (Release)",
             "detail": "Release 构建：开启 -O3 优化与 NDEBUG，获得极致运行帧率"
         }
     ]
