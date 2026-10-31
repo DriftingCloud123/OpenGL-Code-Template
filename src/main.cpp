@@ -138,6 +138,19 @@ int main(){
         ourShader.setMat4("projection", projection);
         ourShader.setMat4("view", view);
 
+        ourShader.setVec3("light.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+        
+        ourShader.setVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+        ourShader.setVec3("light.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+        ourShader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+        ourShader.setFloat("shininess", 32.0f);
+        
+        ourShader.setFloat("constant", 1.0f);
+        ourShader.setFloat("linear", 0.09f);
+        ourShader.setFloat("quadratic", 0.032f);
+
+        ourShader.setVec3("viewPos", camera.Position);
+
         // 渲染加载的模型
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f)); // 中心位置

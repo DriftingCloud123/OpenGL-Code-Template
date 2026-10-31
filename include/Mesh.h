@@ -15,11 +15,11 @@ using namespace std;
 #define MAX_BONE_INFLUENCE 4
 
 struct Vertex {
-    // position
+    // 位置
     glm::vec3 Position;
-    // normal
+    // 发现
     glm::vec3 Normal;
-    // texCoords
+    // 纹理坐标
     glm::vec2 TexCoords;
     // tangent
     glm::vec3 Tangent;
@@ -66,8 +66,8 @@ public:
         unsigned int heightNr   = 1;
         for(unsigned int i = 0; i < textures.size(); i++)
         {
-            glActiveTexture(GL_TEXTURE0 + i); // active proper texture unit before binding
-            // retrieve texture number (the N in diffuse_textureN)
+            glActiveTexture(GL_TEXTURE0 + i); // 在绑定之前激活正确的纹理单元
+            // 提取纹理序号
             string number;
             string name = textures[i].type;
             if(name == "texture_diffuse")
@@ -76,12 +76,12 @@ public:
                 number = std::to_string(specularNr++); // transfer unsigned int to string
             else if(name == "texture_normal")
                 number = std::to_string(normalNr++); // transfer unsigned int to string
-             else if(name == "texture_height")
+            else if(name == "texture_height")
                 number = std::to_string(heightNr++); // transfer unsigned int to string
 
-            // now set the sampler to the correct texture unit
+            // 将upsampler设置为正确的纹理单元
             glUniform1i(glGetUniformLocation(shader.ID, (name + number).c_str()), i);
-            // and finally bind the texture
+            // 之后正确绑定纹理，将纹理ID设置到正确的纹理单元上
             glBindTexture(GL_TEXTURE_2D, textures[i].id);
         }
         
@@ -95,10 +95,10 @@ public:
     }
 
 private:
-    // render data 
+    // 渲染数据
     unsigned int VBO, EBO;
 
-    // initializes all the buffer objects/arrays
+    // 初始化所有缓冲区对象/数组
     void setupMesh()
     {
         // create buffers/arrays
@@ -118,13 +118,13 @@ private:
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
 
         // set the vertex attribute pointers
-        // vertex Positions
+        // vertex 位置 —— 0号，vec3
         glEnableVertexAttribArray(0);	
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-        // vertex normals
+        // vertex 法线 —— 1号，vec3
         glEnableVertexAttribArray(1);	
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Normal));
-        // vertex texture coords
+        // vertex 纹理坐标 —— 2号，vec2
         glEnableVertexAttribArray(2);	
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, TexCoords));
         // vertex tangent
