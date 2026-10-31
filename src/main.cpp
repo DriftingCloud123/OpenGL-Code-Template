@@ -26,10 +26,7 @@ unsigned int loadTexture(char const * path);
 float deltaTime = 0.0f; // 当前帧与上一帧的时间差
 float lastFrame = 0.0f; // 上一帧的时间
 
-// 摄像机配置
-// glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
-// glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-// glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
+// 摄像机
 Camera camera = Camera(
     // pos
     glm::vec3(0.0f, 0.0f, 3.0f),
@@ -40,14 +37,6 @@ Camera camera = Camera(
     //pitch
     0.0f
 );
-
-// 摄像机俯仰角
-// glm::vec3 direction(1.0f);
-// float yaw = -90.0f;
-// float pitch = 0;
-
-// 摄像机视野 Field of View
-// float fov = 45.0f;
 
 // 窗口配置
 int WINDOW_WIDTH = 800;
@@ -104,12 +93,18 @@ float vertices[] = {
     -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
 };
 
-// 绘图顺序索引，本模板如果不适用glDrawElements则无效
-unsigned int indices[] = {
-    // 第一个三角形
-    0, 1, 2,
-    // 第二个三角形
-    0, 2, 3
+// 箱子位置
+glm::vec3 cubePositions[] = {
+    glm::vec3( 0.0f,  0.0f,  0.0f),
+    glm::vec3( 2.0f,  5.0f, -15.0f),
+    glm::vec3(-1.5f, -2.2f, -2.5f),
+    glm::vec3(-3.8f, -2.0f, -12.3f),
+    glm::vec3( 2.4f, -0.4f, -3.5f),
+    glm::vec3(-1.7f,  3.0f, -7.5f),
+    glm::vec3( 1.3f, -2.0f, -2.5f),
+    glm::vec3( 1.5f,  2.0f, -2.5f),
+    glm::vec3( 1.5f,  0.2f, -1.5f),
+    glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
 
@@ -247,12 +242,11 @@ int main(){
     // 设置纹理
     // ============================================
     // 生成漫反射纹理
-    unsigned int diffuseMap = loadTexture("assets/textures/container.jpg");
+    // 漫反射贴图要与 container2_specular.png 使用同一套 UV 内容
+    unsigned int diffuseMap = loadTexture("assets/textures/container2.png");
 
-    // unsigned int specularMap = loadTexture("assets/textures/lighting_maps_specular_color.png");
+    // 生成镜面反射纹理
     unsigned int specularMap = loadTexture("assets/textures/container2_specular.png");
-
-    unsigned int emissionrMap = loadTexture("assets/textures/matrix.jpg");
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, diffuseMap);
@@ -260,13 +254,10 @@ int main(){
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, specularMap);
 
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, emissionrMap);
 
     CubeShader.use();
     CubeShader.setInt("material.diffuse", 0);
     CubeShader.setInt("material.specular", 1);
-    CubeShader.setInt("material.emission", 2);
 
     // 配置坐标变换矩阵
     // 局部坐标 => 世界坐标 => 观察坐标 => 裁剪坐标 => 屏幕坐标
@@ -290,12 +281,16 @@ int main(){
     CubeShader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
     CubeShader.setVec3("light.diffuse",  0.5f, 0.5f, 0.5f); // 将光照调暗了一些以搭配场景
     CubeShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f); 
+    CubeShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f); 
+    // 平行光/定向光：direction 是光线传播方向，着色器里取反得到指向光源的 L 向量。
+    // 让光线主要沿 -Z 照射，正面反射光才能朝向初始位于 +Z 的摄像机。但是摄像机的位置需要在渲染中不断调整
+    CubeShader.setVec3("light.direction", -0.2f, -0.3f, -1.0f);
     // ========================================================================================================
     // 设置物体材质
     CubeShader.use();
-    // CubeShader.setVec3("material.ambient",  1.0f, 0.5f, 0.31f);
-    // CubeShader.setVec3("material.diffuse",  1.0f, 0.5f, 0.31f);
-    // CubeShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+    CubeShader.setVec3("material.ambient",  1.0f, 0.5f, 0.31f);
+    CubeShader.setVec3("material.diffuse",  1.0f, 0.5f, 0.31f);
+    CubeShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
     CubeShader.setFloat("material.shininess", 32.0f);
 
     LighterShader.use();
@@ -358,30 +353,26 @@ int main(){
         // glClear(GL_COLOR_BUFFER_BIT);           // 清空背景并重新渲染指定颜色
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     // 清空背景并重新渲染指定颜色，同时清空深度缓冲
 
-        // change the light's position values over time (can be done anywhere in the render loop actually, but try to do it at least before using the light source positions)
-        // lightPos.x = sin(glfwGetTime()) * 1.5f;
-        // lightPos.y = sin(glfwGetTime() / 1.5f) * 1.5f;
-        // lightPos.z = cos(glfwGetTime()) * 1.5f;
 
         // 绘制物体
         CubeShader.use();
         CubeShader.setMat4("view", view);
         CubeShader.setMat4("projection", projection);
-        CubeShader.setVec3("light.position", lightPos);
+
         CubeShader.setVec3("viewPos", camera.Position);
         glBindVertexArray(CubeVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
-        // glm::vec3 lightColor;
-        // lightColor.x = sin(glfwGetTime() * 2.0f);
-        // lightColor.y = sin(glfwGetTime() * 0.7f);
-        // lightColor.z = sin(glfwGetTime() * 1.3f);
+        for(int i = 0; i < 10; i++){
+            CubeShader.use();
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            float angle = 20.0f * i;
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            CubeShader.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
-        // glm::vec3 diffuseColor = lightColor   * glm::vec3(0.5f); // 降低影响
-        // glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f); // 很低的影响
-
-        // CubeShader.setVec3("light.ambient", ambientColor);
-        // CubeShader.setVec3("light.diffuse", diffuseColor);
-
+        // 绘制光源
         LighterShader.use();
         model = glm::mat4(1.0f);
         model = glm::translate(model, lightPos);
@@ -389,13 +380,12 @@ int main(){
         LighterShader.setMat4("model", model);
         LighterShader.setMat4("view", view);
         LighterShader.setMat4("projection", projection);
+
         glBindVertexArray(LighterVAO);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         // 交换缓冲并检查调用事件
         glfwSwapBuffers(window);
         glfwPollEvents();
-
-
     }
 
     
