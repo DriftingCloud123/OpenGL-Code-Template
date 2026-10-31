@@ -109,8 +109,12 @@ glm::vec3 cubePositions[] = {
 
 
 // 光源位置
-// glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-glm::vec3 lightPos(1.5f, 1.0f, 2.0f);
+glm::vec3 pointLightPositions[] = {
+    glm::vec3( 0.7f,  0.2f,  2.0f),
+    glm::vec3( 2.3f, -3.3f, -4.0f),
+    glm::vec3(-4.0f,  2.0f, -12.0f),
+    glm::vec3( 0.0f,  0.0f, -3.0f)
+};
 
 int main(){
 
@@ -258,6 +262,7 @@ int main(){
     CubeShader.use();
     CubeShader.setInt("material.diffuse", 0);
     CubeShader.setInt("material.specular", 1);
+    
 
     // 配置坐标变换矩阵
     // 局部坐标 => 世界坐标 => 观察坐标 => 裁剪坐标 => 屏幕坐标
@@ -275,29 +280,6 @@ int main(){
     projection = glm::perspective(glm::radians(camera.Zoom), (float)WINDOW_WIDTH / WINDOW_HEIGHT, 0.1f, 100.0f);
     CubeShader.setMat4("projection", projection);
 
-    // CubeShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-    // CubeShader.setVec3("lightColor",  1.0f, 1.0f, 1.0f);
-
-    // 设置点光源位置
-    // CubeShader.setVec3("light.position", lightPos);
-    // 平行光/定向光：direction 是光线传播方向，着色器里取反得到指向光源的 L 向量。
-    // 让光线主要沿 -Z 照射，正面反射光才能朝向初始位于 +Z 的摄像机。但是摄像机的位置需要在渲染中不断调整
-    // CubeShader.setVec3("light.direction", -0.2f, -0.3f, -1.0f);
-    // 设置聚光的属性
-    CubeShader.setVec3("light.position", camera.Position);
-    CubeShader.setVec3("light.direction", camera.Front);
-    CubeShader.setFloat("light.cutOff", glm::cos(glm::radians(8.5)));
-    CubeShader.setFloat("light.outerCutOff", glm::cos(glm::radians(12.5)));
-
-    // 设置光照属性
-    CubeShader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
-    CubeShader.setVec3("light.diffuse",  0.5f, 0.5f, 0.5f); // 将光照调暗了一些以搭配场景
-    CubeShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f); 
-    CubeShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-
-    CubeShader.setFloat("light.constant",  1.0f);
-    CubeShader.setFloat("light.linear",    0.09f);
-    CubeShader.setFloat("light.quadratic", 0.032f);
      
     // ========================================================================================================
     // 设置物体材质
@@ -307,9 +289,57 @@ int main(){
     CubeShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
     CubeShader.setFloat("material.shininess", 32.0f);
 
+    // directional light
+    CubeShader.setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
+    CubeShader.setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+    CubeShader.setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+    CubeShader.setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);
+    // point light 1
+    CubeShader.setVec3("pointLights[0].position", pointLightPositions[0]);
+    CubeShader.setVec3("pointLights[0].ambient", 0.05f, 0.05f, 0.05f);
+    CubeShader.setVec3("pointLights[0].diffuse", 0.8f, 0.8f, 0.8f);
+    CubeShader.setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+    CubeShader.setFloat("pointLights[0].constant", 1.0f);
+    CubeShader.setFloat("pointLights[0].linear", 0.09f);
+    CubeShader.setFloat("pointLights[0].quadratic", 0.032f);
+    // point light 2
+    CubeShader.setVec3("pointLights[1].position", pointLightPositions[1]);
+    CubeShader.setVec3("pointLights[1].ambient", 0.05f, 0.05f, 0.05f);
+    CubeShader.setVec3("pointLights[1].diffuse", 0.8f, 0.8f, 0.8f);
+    CubeShader.setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
+    CubeShader.setFloat("pointLights[1].constant", 1.0f);
+    CubeShader.setFloat("pointLights[1].linear", 0.09f);
+    CubeShader.setFloat("pointLights[1].quadratic", 0.032f);
+    // point light 3
+    CubeShader.setVec3("pointLights[2].position", pointLightPositions[2]);
+    CubeShader.setVec3("pointLights[2].ambient", 0.05f, 0.05f, 0.05f);
+    CubeShader.setVec3("pointLights[2].diffuse", 0.8f, 0.8f, 0.8f);
+    CubeShader.setVec3("pointLights[2].specular", 1.0f, 1.0f, 1.0f);
+    CubeShader.setFloat("pointLights[2].constant", 1.0f);
+    CubeShader.setFloat("pointLights[2].linear", 0.09f);
+    CubeShader.setFloat("pointLights[2].quadratic", 0.032f);
+    // point light 4
+    CubeShader.setVec3("pointLights[3].position", pointLightPositions[3]);
+    CubeShader.setVec3("pointLights[3].ambient", 0.05f, 0.05f, 0.05f);
+    CubeShader.setVec3("pointLights[3].diffuse", 0.8f, 0.8f, 0.8f);
+    CubeShader.setVec3("pointLights[3].specular", 1.0f, 1.0f, 1.0f);
+    CubeShader.setFloat("pointLights[3].constant", 1.0f);
+    CubeShader.setFloat("pointLights[3].linear", 0.09f);
+    CubeShader.setFloat("pointLights[3].quadratic", 0.032f);
+    // spotLight
+    CubeShader.setVec3("spotLight.position", camera.Position);
+    CubeShader.setVec3("spotLight.direction", camera.Front);
+    CubeShader.setVec3("spotLight.ambient", 0.0f, 0.0f, 0.0f);
+    CubeShader.setVec3("spotLight.diffuse", 1.0f, 1.0f, 1.0f);
+    CubeShader.setVec3("spotLight.specular", 1.0f, 1.0f, 1.0f);
+    CubeShader.setFloat("spotLight.constant", 1.0f);
+    CubeShader.setFloat("spotLight.linear", 0.09f);
+    CubeShader.setFloat("spotLight.quadratic", 0.032f);
+    CubeShader.setFloat("spotLight.innerCutOff", glm::cos(glm::radians(12.5f)));
+    CubeShader.setFloat("spotLight.outerCutOff", glm::cos(glm::radians(15.0f)));   
+
     LighterShader.use();
     model = glm::mat4(1.0f);
-    model = glm::translate(model, lightPos);
     model = glm::scale(model, glm::vec3(0.2f));
     LighterShader.setMat4("model", model);
 
@@ -372,12 +402,12 @@ int main(){
         CubeShader.use();
         CubeShader.setMat4("view", view);
         CubeShader.setMat4("projection", projection);
-        CubeShader.setVec3("light.position", camera.Position);
-        CubeShader.setVec3("light.direction", camera.Front);
-
         CubeShader.setVec3("viewPos", camera.Position);
+
+        CubeShader.setVec3("spotLight.direction", camera.Front);
+        CubeShader.setVec3("spotLight.position", camera.Position);
+
         glBindVertexArray(CubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
         for(int i = 0; i < 10; i++){
             CubeShader.use();
             model = glm::mat4(1.0f);
@@ -390,15 +420,17 @@ int main(){
 
         // 绘制光源
         LighterShader.use();
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, lightPos);
-        model = glm::scale(model, glm::vec3(0.2f));
-        LighterShader.setMat4("model", model);
         LighterShader.setMat4("view", view);
         LighterShader.setMat4("projection", projection);
-
         glBindVertexArray(LighterVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        for(int i = 0; i < 4; i++){
+            model = glm::mat4(1.0f);
+            model = glm::translate(model, pointLightPositions[i]);
+            model = glm::scale(model, glm::vec3(0.2f));
+            LighterShader.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+
         // 交换缓冲并检查调用事件
         glfwSwapBuffers(window);
         glfwPollEvents();
