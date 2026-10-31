@@ -277,11 +277,18 @@ int main(){
 
     // CubeShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
     // CubeShader.setVec3("lightColor",  1.0f, 1.0f, 1.0f);
+
     // 设置点光源位置
-    CubeShader.setVec3("light.position", lightPos);
+    // CubeShader.setVec3("light.position", lightPos);
     // 平行光/定向光：direction 是光线传播方向，着色器里取反得到指向光源的 L 向量。
     // 让光线主要沿 -Z 照射，正面反射光才能朝向初始位于 +Z 的摄像机。但是摄像机的位置需要在渲染中不断调整
     // CubeShader.setVec3("light.direction", -0.2f, -0.3f, -1.0f);
+    // 设置聚光的属性
+    CubeShader.setVec3("light.position", camera.Position);
+    CubeShader.setVec3("light.direction", camera.Front);
+    CubeShader.setFloat("light.cutOff", glm::cos(glm::radians(8.5)));
+    CubeShader.setFloat("light.outerCutOff", glm::cos(glm::radians(12.5)));
+
     // 设置光照属性
     CubeShader.setVec3("light.ambient",  0.2f, 0.2f, 0.2f);
     CubeShader.setVec3("light.diffuse",  0.5f, 0.5f, 0.5f); // 将光照调暗了一些以搭配场景
@@ -365,6 +372,8 @@ int main(){
         CubeShader.use();
         CubeShader.setMat4("view", view);
         CubeShader.setMat4("projection", projection);
+        CubeShader.setVec3("light.position", camera.Position);
+        CubeShader.setVec3("light.direction", camera.Front);
 
         CubeShader.setVec3("viewPos", camera.Position);
         glBindVertexArray(CubeVAO);
